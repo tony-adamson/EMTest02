@@ -12,6 +12,7 @@ struct EMTest02App: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(JobViewModel())
         }
     }
 }
