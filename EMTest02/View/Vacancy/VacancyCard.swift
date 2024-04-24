@@ -25,6 +25,7 @@ struct VacancyCard: View {
                         .imageScale(.large)
                 }
                 Text(vacancy.title)
+                    .multilineTextAlignment(.leading)
                 if vacancy.salary.short != nil {
                     Text(vacancy.salary.short!)
                 }
