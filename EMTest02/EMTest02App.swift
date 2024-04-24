@@ -9,10 +9,16 @@ import SwiftUI
 
 @main
 struct EMTest02App: App {
+    @AppStorage("isLoggedIn") var isLoggedIn: Bool = false
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(JobViewModel())
+            if isLoggedIn {
+                ContentView()
+                    .environmentObject(JobViewModel())
+            } else {
+                LoginView()
+            }
         }
     }
 }
