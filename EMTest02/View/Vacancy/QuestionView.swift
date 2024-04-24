@@ -8,8 +8,9 @@
 import SwiftUI
 
 struct QuestionView: View {
+    var question: String
     var body: some View {
-            Text("Какой график работы?")
+            Text(question)
                 .padding(8)
                 .background(.grey2)
                 .foregroundStyle(.white1)
@@ -18,5 +19,5 @@ struct QuestionView: View {
 }
 
 #Preview {
-    QuestionView()
+    QuestionView(question: "Какой график работы?")
 }

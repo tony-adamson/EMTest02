@@ -7,15 +7,30 @@
 
 import SwiftUI
 
+enum InformationType {
+    case applied
+    case looking
+}
+
 struct VacancyViewInformation: View {
     let containerWidth: CGFloat
     let image: Image
+    let personNumber: Int
+    let type: InformationType
     
     var body: some View {
         let itemWidth = (containerWidth - 40) / 2
+        let text: String = {
+            switch type {
+            case .applied:
+                return "\(personNumber) человек уже\n откликнулось"
+            case .looking:
+                return "\(personNumber) человек сейчас смотрят"
+            }
+        }()
         
         HStack(alignment: .top) {
-            Text("120 человек уже\n откликнулось")
+            Text(text)
                 .font(.subheadline)
                 .foregroundStyle(.white)
                 .padding([.leading, .top], 8)
@@ -35,5 +50,5 @@ struct VacancyViewInformation: View {
 }
 
 #Preview {
-    VacancyViewInformation(containerWidth: 450, image: Image("personGreen"))
+    VacancyViewInformation(containerWidth: 450, image: Image("personGreen"), personNumber: 10, type: .applied)
 }

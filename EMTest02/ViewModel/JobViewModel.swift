@@ -12,6 +12,7 @@ import Combine
 class JobViewModel: ObservableObject {
     @Published var jobData: JobData?
     @Published var isLoading = true
+    @Published var favorites: [Vacancy] = []
     private var cancellables = Set<AnyCancellable>()
     private var session: Session
 
@@ -37,13 +38,7 @@ class JobViewModel: ObservableObject {
         
         AF.request(url)
             .publishDecodable(type: JobData.self)
-//            .compactMap { $0.value }
-            .tryMap { response -> JobData in
-                guard let value = response.value else {
-                    throw URLError(.cannotDecodeContentData)
-                }
-                return value
-            }
+            .compactMap { $0.value }
             .receive(on: DispatchQueue.main)
             .sink(receiveCompletion: { [weak self] completion in
                 switch completion {
@@ -54,10 +49,19 @@ class JobViewModel: ObservableObject {
                 }
                 self?.isLoading = false
             }, receiveValue: { [weak self] receivedData in
-                print("Данные получены: \(receivedData)")
                 self?.jobData = receivedData
+                self?.updateFavorites()
             })
             .store(in: &cancellables)
-            
+    }
+    
+    func updateFavorites() {
+            favorites = jobData?.vacancies.filter { $0.isFavorite } ?? []
+        }
+
+    func toggleFavorite(vacancy: Vacancy) {
+        guard let index = jobData?.vacancies.firstIndex(where: { $0.id == vacancy.id }) else { return }
+        jobData?.vacancies[index].isFavorite.toggle() // Переключение статуса избранного
+        updateFavorites()
     }
 }

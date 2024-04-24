@@ -16,11 +16,11 @@ struct Offer: Codable {
     var id: String?
     var title: String
     var link: String
-    var button: Button?
+    var button: Buttons?
+}
 
-    struct Button: Codable {
-        var text: String
-    }
+struct Buttons: Codable {
+    var text: String
 }
 
 struct Vacancy: Codable, Identifiable {
@@ -34,24 +34,24 @@ struct Vacancy: Codable, Identifiable {
     var isFavorite: Bool
     var salary: Salary
     var schedules: [String]
-    var appliedNumber: Int
-    var description: String
+    var appliedNumber: Int?
+    var description: String?
     var responsibilities: String
     var questions: [String]
+}
 
-    struct Address: Codable {
-        var town: String
-        var street: String
-        var house: String
-    }
+struct Address: Codable {
+    var town: String
+    var street: String
+    var house: String
+}
 
-    struct Experience: Codable {
-        var previewText: String
-        var text: String
-    }
+struct Experience: Codable {
+    var previewText: String
+    var text: String
+}
 
-    struct Salary: Codable {
-        var short: String?
-        var full: String
-    }
+struct Salary: Codable {
+    var short: String?
+    var full: String
 }

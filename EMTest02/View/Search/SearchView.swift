@@ -21,9 +21,12 @@ struct SearchView: View {
                         FastFilterRow()
                     } else {
                         HStack {
-                            Text("Количество вакансий")
+                            if jobViewModel.jobData != nil {
+                                Text("\(jobViewModel.jobData!.vacancies.count) вакансий")
+                            }
                             Spacer()
-                            Text("Сортировка по")
+                            Text("Сортировка")
+                                .foregroundStyle(.blue1)
                         }
                     }
                     
@@ -42,18 +45,18 @@ struct SearchView: View {
                         if let vacancies = jobViewModel.jobData?.vacancies {
                             if showAll {
                                 ForEach(vacancies) { vacancy in
-                                    VacancyCard()
+                                    VacancyCard(vacancy: vacancy)
                                 }
                             } else {
                                 ForEach(vacancies.prefix(3)) { vacancy in
-                                    VacancyCard()
+                                    VacancyCard(vacancy: vacancy)
                                 }
                             }
                         }
                     }
                     
-                    if !showAll && !jobViewModel.isLoading {
-                        Button("Еще ХХХ вакансий") {
+                    if !showAll && !jobViewModel.isLoading && jobViewModel.jobData != nil {
+                        Button("Еще \(jobViewModel.jobData!.vacancies.count) вакансий") {
                             showAll = true
                         }
                         .frame(height: 48)

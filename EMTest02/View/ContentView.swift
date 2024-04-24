@@ -31,7 +31,12 @@ struct ContentView: View {
                 .tabItem {
                     Label("Поиск", systemImage: "magnifyingglass")
                 }
+            FavoriteView()
+                .tabItem {
+                    Label("Избранное", systemImage: "heart")
+                }
         }
+        .environmentObject(JobViewModel())
         
     }
 }

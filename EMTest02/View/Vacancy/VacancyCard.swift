@@ -8,27 +8,34 @@
 import SwiftUI
 
 struct VacancyCard: View {
+    @EnvironmentObject var jobViewModel: JobViewModel
+    var vacancy: Vacancy
+    
     var body: some View {
-        NavigationLink(destination: VacancyView()) {
+        NavigationLink(destination: VacancyView(vacancy: vacancy)) {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Text("Сейчас просматривает 7 человек")
-                        .foregroundStyle(.green1)
+                    if vacancy.lookingNumber != nil {
+                        Text("Сейчас просматривает \(vacancy.lookingNumber!) человек")
+                            .foregroundStyle(.green1)
                         .font(.caption)
+                    }
                     Spacer()
-                    Image(systemName: "heart")
+                    Image(systemName: vacancy.isFavorite ? "heart.fill" : "heart")
                         .imageScale(.large)
                 }
-                Text("UX дизайнер")
-                Text("2500-5000")
-                Text("Минск")
-                Text("Софт-софт")
+                Text(vacancy.title)
+                if vacancy.salary.short != nil {
+                    Text(vacancy.salary.short!)
+                }
+                Text(vacancy.address.town)
+                Text(vacancy.company)
                 HStack {
                     Image(systemName: "case")
                         .imageScale(.small)
-                    Text("Jgsn 3-6 ktr")
+                    Text(vacancy.experience.previewText)
                 }
-                Text("Опубликовано 14 февраля")
+                Text("Опубликовано \(vacancy.publishedDate)")
                     .foregroundStyle(.grey3)
                 Button("Откликнуться") {
                     
@@ -47,5 +54,21 @@ struct VacancyCard: View {
 }
 
 #Preview {
-    VacancyCard()
+    VacancyCard(vacancy: Vacancy(
+        id: "cbf0c984-7c6c-4ada-82da-e29dc698bb50",
+        title: "UI/UX дизайнер",
+        address: Address(town: "Минск", street: "улица Бирюзова", house: "4/5"),
+        company: "Мобирикс",
+        experience: Experience(previewText: "Опыт от 1 до 3 лет", text: "1–3 года"),
+        publishedDate: "2024-02-20",
+        isFavorite: false,
+        salary: Salary(full: "Уровень дохода не указан"),
+        schedules: ["полная занятость", "полный день"],
+        responsibilities: "- проектирование пользовательских сценариев и создание прототипов;",
+        questions: ["Где располагается место работы?",
+                    "Какой график работы?",
+                    "Вакансия открыта?",
+                    "Какая оплата труда?"])
+    )
+        .environmentObject(JobViewModel())
 }

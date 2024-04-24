@@ -8,68 +8,93 @@
 import SwiftUI
 
 struct VacancyView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var jobViewModel: JobViewModel
+    var vacancy: Vacancy
+    
     var body: some View {
+        var schedulesText: String {
+            let formattedSchedules = vacancy.schedules.map { $0.lowercased() }.joined(separator: ", ")
+            return formattedSchedules.prefix(1).uppercased() + formattedSchedules.dropFirst()
+        }
+        
         GeometryReader { geometry in
             ScrollView(.vertical) {
                 VStack(alignment: .leading, spacing: 16) {
-                    /// vacancy name
-                    Text("UI / UX Designer")
+                    // vacancy name
+                    Text(vacancy.title)
                         .font(.title2)
                     
                     VStack(alignment: .leading) {
-                        /// vacancy salary
-                        Text("Уровень дохода не указан")
+                        // vacancy salary
+                        Text(vacancy.salary.full)
                             .font(.callout)
-                        /// vacancy experience
-                        Text("Требуемый опыт: от 1 года до 3 лет")
+                        // vacancy experience
+                        Text("Требуемый опыт: \(vacancy.experience.text)")
                             .font(.callout)
                     }
                     
-                    // TODO: need comment
-                    Text("Полная занятость, Полный день")
-                        .font(.callout)
-                    // TODO: optional block
+                    // schedules
                     HStack {
-                        VacancyViewInformation(
-                            containerWidth: geometry.size.width,
-                            image: Image("personGreen")
-                        )
-                        VacancyViewInformation(
-                            containerWidth: geometry.size.width,
-                            image: Image("eyeGreen")
-                        )
+                        Text(schedulesText)
+                            .font(.callout)
                     }
-                    /// map block
+                    // optional block applied and looking
+                    HStack {
+                        if vacancy.appliedNumber != nil {
+                            VacancyViewInformation(
+                                containerWidth: geometry.size.width,
+                                image: Image("personGreen"),
+                                personNumber: vacancy.appliedNumber!, 
+                                type: .applied
+                            )
+                        }
+                        if vacancy.lookingNumber != nil {
+                            VacancyViewInformation(
+                                containerWidth: geometry.size.width,
+                                image: Image("eyeGreen"), 
+                                personNumber: vacancy.lookingNumber!,
+                                type: .looking
+                            )
+                        }
+                    }
+                    
+                    // map block
                     VStack(alignment: .leading) {
                         HStack {
-                            Text("Мобирикс")
+                            Text(vacancy.company)
                             Image("checkIcon")
                         }
                         Image("mapTemplate")
                             .resizable()
                             .frame(height: 58)
-                        Text("Минск, улица Бирюзова, 4/5")
+                        Text("\(vacancy.address.town), \(vacancy.address.street) \(vacancy.address.house)")
                     }
                     .padding()
                     .frame(maxWidth: .infinity)
                     .background(.grey2)
                     .clipShape(RoundedRectangle(cornerRadius: 8))
                     
-                    Text("MOBYRIX - динамично развивающаяся продуктовая IT-компания, специализирующаяся на разработке мобильных приложений для iOS и Android. Наша команда работает над собственными продуктами в разнообразных сферах: от утилит до развлечений и бизнес-приложений. Мы ценим талант и стремление к инновациям и в данный момент в поиске талантливого UX/UI Designer, готового присоединиться к нашей команде и внести значимый вклад в развитие наших проектов.")
+                    // vacancy description
+                    if vacancy.description != nil {
+                        Text(vacancy.description!)
+                    }
                     
                     Text("Ваши задачи")
                         .font(.title2)
                     
-                    Text("-Проектировать пользовательский опыт, проводить UX исследования; -Разрабатывать адаптивный дизайн интерфейса для мобильных приложений; -Разрабатывать быстрые прототипы для тестирования идеи дизайна и их последующая; интеграция на основе обратной связи от команды и пользователей; -Взаимодействовать с командой разработчиков для обеспечения точной реализации ваших дизайнов; -Анализ пользовательского опыта и адаптация под тренды.")
+                    // vacancy responsibilities
+                    Text(vacancy.responsibilities)
                     
                     Text("Задайте вопрос работодателю")
                     
                     Text("Он получит его вместе с ответом на вакансию")
                     
-                    VStack {
-                        QuestionView()
-                        QuestionView()
-                        QuestionView()
+                    // vacancy questions
+                    VStack(alignment: .leading) {
+                        ForEach(vacancy.questions, id: \.self) { question in
+                            QuestionView(question: question)
+                        }
                     }
                     
                     Button("Откликнуться") {
@@ -94,7 +119,7 @@ struct VacancyView: View {
     
     private var backButton: some View {
         Button(action: {
-            // Здесь код для действия кнопки возврата
+            self.presentationMode.wrappedValue.dismiss()
         }) {
             Image(systemName: "arrow.left")
         }
@@ -102,25 +127,37 @@ struct VacancyView: View {
 
     private var actionButtons: some View {
         HStack {
-            Button(action: {
-                // Действие для первой кнопки
-            }) {
+            Button(action: {}) {
                 Image(systemName: "eye")
             }
-            Button(action: {
-                // Действие для второй кнопки
-            }) {
+            Button(action: {}) {
                 Image(systemName: "link")
             }
             Button(action: {
-                // Действие для третьей кнопки
+                // Действие для кнопки лайк
             }) {
-                Image(systemName: "heart")
+                Image(systemName: vacancy.isFavorite ? "heart.fill" : "heart")
             }
         }
     }
 }
 
 #Preview {
-    VacancyView()
+    VacancyView(vacancy: Vacancy(
+        id: "cbf0c984-7c6c-4ada-82da-e29dc698bb50",
+        title: "UI/UX дизайнер",
+        address: Address(town: "Минск", street: "улица Бирюзова", house: "4/5"),
+        company: "Мобирикс",
+        experience: Experience(previewText: "Опыт от 1 до 3 лет", text: "1–3 года"),
+        publishedDate: "2024-02-20",
+        isFavorite: false,
+        salary: Salary(full: "Уровень дохода не указан"),
+        schedules: ["полная занятость", "полный день"],
+        responsibilities: "- проектирование пользовательских сценариев и создание прототипов;",
+        questions: ["Где располагается место работы?",
+                    "Какой график работы?",
+                    "Вакансия открыта?",
+                    "Какая оплата труда?"])
+    )
+        .environmentObject(JobViewModel())
 }
